@@ -8,6 +8,7 @@ Node.js + Express API that serves the **top 20 premium Airbnb listings** per sta
 
 ## Table of Contents
 
+- [Problem Statement](#problem-statement)
 - [Overview](#overview)
 - [Dataset](#dataset)
 - [Architecture](#architecture)
@@ -17,21 +18,31 @@ Node.js + Express API that serves the **top 20 premium Airbnb listings** per sta
 - [How to Run](#how-to-run)
 - [Future Improvements](#future-improvements)
 
+## Problem Statement
+
+**Frontend Challenge:** The Airbnb app frontend fetches data from the backend, but there's a **regulatory restriction** - users can **only see premium listings** from specific jurisdictions (Melbourne/VIC and Sydney/NSW). 
+
+**Solution:** This API implements a **jurisdiction toggle system** (`stateToggle=on`) that acts as a **backend gatekeeper**. When activated with `allowedStates=vic,nsw`, it filters to **only premium listings** from approved states, ensuring **compliance** while serving the top-ranked properties.
+
+Node.js backend validates all requests and **blocks non-compliant data** from reaching the frontend.
+
 ## Overview
 
-This project is a **backend-focused portfolio project** that demonstrates:
+This project solves the **jurisdiction filtering problem** by:
 
-- Loading **48k+ real Airbnb listings** from CSV files into memory.
-- Tagging each listing with its **Australian state** (VIC, NSW, QLD, SA) based on filename.
-- Computing a **premium score** per listing using reviews and recency.
-- Exposing a clean **REST API** to fetch the **top 20 premium listings** per state.
-- Providing an **interactive CLI** to generate ready-to-use API URLs for different states.
+- Loading **48k+ real Airbnb listings** from 4 Australian states (VIC, NSW, QLD, SA)
+- Implementing **premium ranking** (reviews + LTM score) for each listing
+- Exposing a **state toggle API** that enforces regulatory compliance:
+  - `stateToggle=on&allowedStates=vic,nsw` → **Only Melbourne + Sydney premium listings**
+  - `stateToggle=on&allowedStates=sa` → **South Australia premium listings** (if jurisdictionally approved)
+- Providing **interactive CLI** for testing jurisdiction combinations
+- Ensuring **Node.js backend validation** prevents unfiltered data exposure
 
-It showcases:
-
-- Data ingestion and transformation from CSV.
-- Lightweight ranking logic inspired by how Airbnb surfaces top listings in search results. [web:19][web:22]
-- Clean API and CLI design in Node.js.
+**Key Features:**
+- Backend jurisdiction switch (`stateToggle=on/off`)
+- Premium-only filtering (top 20 per jurisdiction)
+- Multi-state combinations (`vic,nsw`)
+- Clean JSON API for frontend consumption
 
 ## Dataset
 
