@@ -10,15 +10,14 @@ const states = {
   2: { name: 'Sydney (NSW)',    url: 'http://localhost:3000/listings?stateToggle=on&allowedStates=nsw' },
   3: { name: 'Brisbane (QLD)',  url: 'http://localhost:3000/listings?stateToggle=on&allowedStates=qld' },
   4: { name: 'Barossa Valley (SA)', url: 'http://localhost:3000/listings?stateToggle=on&allowedStates=sa' },
-  5: { name: 'NSW + VIC Combo', url: 'http://localhost:3000/listings?stateToggle=on&allowedStates=nsw,vic' },
-  6: { name: 'All Premium Listings', url: 'http://localhost:3000/listings' },
+  5: { name: 'All Premium Listings', url: 'http://localhost:3000/listings' },
   0: { name: 'Exit', url: null }
 };
 
 function showMenu() {
   console.clear();
   console.log('Airbnb Filter API CLI\n');
-  console.log('Select state (1-6) or 0 to exit:');
+  console.log('Select state (1-5) or 0 to exit:');
   console.log('='.repeat(50));
 
   Object.entries(states).forEach(([key, { name }]) => {
