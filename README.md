@@ -1,15 +1,30 @@
 # Airbnb Premium Listings Filter API 
 
 **Author:** Areesha Majid  
-*Data Analyst | SQL | Python | Node.js*
+*Node.js*
 
 ---
-Node.js + Express API that serves the **top 20 premium Airbnb listings** per state from **48k+ real Australian listings** (VIC, NSW, QLD, SA). Premium listings are ranked using a **multi-factor score** based on total reviews, last‑12‑months reviews, and review recency, inspired by Airbnb’s search ranking principles. [web:19][web:22]
+
+## Problem Statement
+
+**Frontend Challenge:** This API implements a **jurisdiction toggle system** (`stateToggle=on`) that acts as a **backend gatekeeper**. When activated, it filters to **only premium listings** from approved states specified in `allowedStates` (**vic**, **nsw**, **qld**, **sa**, or any combination), ensuring **compliance** while serving the top-ranked properties.
+
+## Overview
+
+This project solves the **jurisdiction filtering problem** by:
+
+- Loading **real Airbnb listings** from 4 Australian states (VIC, NSW, QLD, SA)
+- Implementing **premium ranking** (reviews + LTM score) for each listing
+- Exposing a **state toggle API** that supports **all states**:
+  - `stateToggle=on&allowedStates=vic` → VIC only
+  - `stateToggle=on&allowedStates=nsw` → NSW only  
+  - `stateToggle=on&allowedStates=qld` → QLD only
+  - `stateToggle=on&allowedStates=sa` → SA only
+- Providing **interactive CLI** for testing all combinations
+- Ensuring **Node.js backend validation** prevents unfiltered data exposure
 
 ## Table of Contents
 
-- [Problem Statement](#problem-statement)
-- [Overview](#overview)
 - [Dataset](#dataset)
 - [Architecture](#architecture)
 - [Premium Ranking Logic](#premium-ranking-logic)
@@ -18,40 +33,16 @@ Node.js + Express API that serves the **top 20 premium Airbnb listings** per sta
 - [How to Run](#how-to-run)
 - [Future Improvements](#future-improvements)
 
-## Problem Statement
-
-**Frontend Challenge:** The Airbnb app frontend fetches data from the backend, but there's a **regulatory restriction** - users can **only see premium listings** from specific jurisdictions (Melbourne/VIC and Sydney/NSW). 
-
-**Solution:** This API implements a **jurisdiction toggle system** (`stateToggle=on`) that acts as a **backend gatekeeper**. When activated with `allowedStates=vic,nsw`, it filters to **only premium listings** from approved states, ensuring **compliance** while serving the top-ranked properties.
-
-Node.js backend validates all requests and **blocks non-compliant data** from reaching the frontend.
-
-## Overview
-
-This project solves the **jurisdiction filtering problem** by:
-
-- Loading **48k+ real Airbnb listings** from 4 Australian states (VIC, NSW, QLD, SA)
-- Implementing **premium ranking** (reviews + LTM score) for each listing
-- Exposing a **state toggle API** that enforces regulatory compliance:
-  - `stateToggle=on&allowedStates=vic,nsw` → **Only Melbourne + Sydney premium listings**
-  - `stateToggle=on&allowedStates=sa` → **South Australia premium listings** (if jurisdictionally approved)
-- Providing **interactive CLI** for testing jurisdiction combinations
-- Ensuring **Node.js backend validation** prevents unfiltered data exposure
-
-**Key Features:**
-- Backend jurisdiction switch (`stateToggle=on/off`)
-- Premium-only filtering (top 20 per jurisdiction)
-- Multi-state combinations (`vic,nsw`)
-- Clean JSON API for frontend consumption
-
 ## Dataset
 
-The project uses Airbnb-style listing data for 4 Australian regions:
+**48k+ real Airbnb listings** across 4 Australian jurisdictions:
 
-- **VIC** – Melbourne and nearby councils  
-- **NSW** – Sydney and surrounding areas  
-- **QLD** – Brisbane and Sunshine Coast  
-- **SA** – Barossa Valley  
+| State | Dataset | Total Listings |
+|-------|---------|----------------|
+| VIC   | Melbourne | 24,491 |
+| NSW   | Sydney | 17,730 |
+| QLD   | Brisbane | 6,147 |
+| SA    | Barossa Valley | 353 |
 
 Each CSV contains columns such as:
 
@@ -114,12 +105,3 @@ Flow:
 2. Compute `premiumScore` for each listing.
 3. Sort in **descending** order of `premiumScore`.
 4. Return the **top 20** listings.
-
-The API hides `premiumScore` in the response to keep JSON clean, but ranking is fully driven by this score.
-
-## API Design
-
-### Base URL
-
-```text
-http://localhost:3000
