@@ -1,60 +1,49 @@
-const express = require("express");
-const data = require("./data");
+const express = require('express');
+const { loadAllListings, getFilteredListings } = require('./data');
 
 const app = express();
 const PORT = 3000;
-let cachedListings = [];
 
-app.use(express.json());
+let dataLoaded = false;
 
-app.get("/", async (req, res) => {
-  if (cachedListings.length === 0) {
-    console.log('🔄 Loading CSV data...');
-    cachedListings = await data.loadListings();
-  }
-  res.json({ 
-    message: "Real Airbnb API ✅", 
-    totalListings: cachedListings.length,
-    testQLD: "/listings?stateToggle=on&allowedStates=QLD"
+// Load data once on server start
+loadAllListings()
+  .then(() => {
+    dataLoaded = true;
+    console.log('All listings loaded into memory.');
+  })
+  .catch(err => {
+    console.error('Error loading listings:', err);
   });
-});
 
-app.get("/listings", async (req, res) => {
-  if (cachedListings.length === 0) {
-    cachedListings = await data.loadListings();
-  }
-  
-  const { stateToggle, allowedStates, limit = 20 } = req.query;
-  
-  let result = cachedListings.filter(item => 
-    item.isPremium && 
-    ["brisbane", "melbourne", "sydney"].some(city => 
-      item.city.toLowerCase().includes(city)
-    )
+app.get('/', (req, res) => {
+  res.send(
+    '<h1>Airbnb Premium Listings API</h1>' +
+    '<p>Use <code>/listings?stateToggle=on&allowedStates=vic</code> etc.</p>'
   );
-  
-  if (stateToggle === "on" && allowedStates) {
-    const states = allowedStates.split(",").map(s => s.trim().toUpperCase());
-    result = result.filter(item => states.includes(item.state));
+});
+
+app.get('/listings', (req, res) => {
+  if (!dataLoaded) {
+    return res.status(503).json({ error: 'Data is still loading, try again in a few seconds.' });
   }
-  
-  result = result.slice(0, parseInt(limit));
-  
+
+  const { stateToggle, allowedStates, limit } = req.query;
+
+  const listings = getFilteredListings({
+    stateToggle,
+    allowedStates,
+    limit: limit ? parseInt(limit, 10) : 20
+  });
+
   res.json({
-    count: result.length,
-    totalPremium: cachedListings.filter(l => l.isPremium).length,
-    filtersApplied: {
-      legalRule: true,
-      stateToggle: stateToggle === "on",
-      allowedStates: allowedStates || "ALL"
-    },
-    data: result
+    count: listings.length,
+    stateToggle: stateToggle || 'off',
+    allowedStates: allowedStates || null,
+    listings
   });
 });
 
-// Start server FIRST, load data on first request
 app.listen(PORT, () => {
-  console.log(`Server LIVE: http://localhost:${PORT}`);
-  console.log(`48,368 real listings ready!`);
-  console.log(`Test: http://localhost:${PORT}/listings?stateToggle=on&allowedStates=QLD`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
