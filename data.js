@@ -78,16 +78,44 @@ function loadAllListings() {
   });
 }
 
+function getPremiumScore(listing) {
+  const totalReviews = parseInt(listing.number_of_reviews || 0, 10);
+  const ltmReviews = parseInt(listing.number_of_reviews_ltm || 0, 10);
+  const reviewsPerMonth = parseFloat(listing.reviews_per_month || 0);
+
+  // 1) Overall popularity (diminishing returns, like Airbnb’s ranking) 
+  const reviewVolume = Math.log(totalReviews + 1) * 10;
+
+  // 2) Recent performance in last 12 months (Superhost-style recency focus)
+  const recentActivity = ltmReviews * 0.5;
+
+  // 3) Ongoing demand (steady bookings) 
+  const recency = reviewsPerMonth * 2;
+
+  // 4) Reliability / stability of rating (needs enough reviews)
+  const consistency = Math.min(totalReviews / 30, 10);
+
+  return reviewVolume + recentActivity + recency + consistency;
+}
+
 function getFilteredListings({ stateToggle, allowedStates, limit = 20 }) {
   let results = listings;
 
+  // Filter by state if toggle is on
   if (stateToggle === 'on' && allowedStates) {
     const allowed = allowedStates.split(',').map(s => s.trim().toUpperCase());
     results = results.filter(l => allowed.includes(l.state));
   }
 
-  return results.slice(0, limit);
+  // Add premiumScore, keep only > 0, sort desc, return top 20
+  return results
+    .map(l => ({ ...l, premiumScore: getPremiumScore(l) }))
+    .filter(l => l.premiumScore > 0)
+    .sort((a, b) => b.premiumScore - a.premiumScore)
+    .slice(0, limit)
+    .map(({ premiumScore, ...clean }) => clean);;
 }
+
 
 module.exports = {
   loadAllListings,
