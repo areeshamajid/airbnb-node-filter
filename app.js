@@ -36,7 +36,7 @@ app.get('/listings', (req, res) => {
   const listings = getFilteredListings({
     stateToggle,
     allowedStates,
-    limit: limit ? parseInt(limit, 10) : 500
+    limit: limit ? parseInt(limit, 10) : 20
   });
 
   res.json({
