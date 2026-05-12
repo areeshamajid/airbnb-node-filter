@@ -9,8 +9,6 @@
  * 
  * Key Features:
  * - Melbourne/Sydney premium listings (for legal rule testing)
- * - NSW/VIC listings (for state toggle testing)  
- * - SA/WA listings (blocked unless jurisdiction toggle allows)
  * 
  * Usage in app.js:
  * - Imported via: const { listings } = require("./data");
@@ -113,7 +111,7 @@ function getFilteredListings({ stateToggle, allowedStates, limit = 20 }) {
     .filter(l => l.premiumScore > 0)
     .sort((a, b) => b.premiumScore - a.premiumScore)
     .slice(0, limit)
-    .map(({ premiumScore, ...clean }) => clean);;
+      .map(({ premiumScore, ...clean }) => clean);;
 }
 
 

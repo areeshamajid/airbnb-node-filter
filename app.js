@@ -2,6 +2,8 @@ const express = require('express');
 const { loadAllListings, getFilteredListings } = require('./data');
 
 const app = express();
+const cors = require('cors');
+app.use(cors());
 const PORT = 3000;
 
 let dataLoaded = false;
@@ -29,11 +31,12 @@ app.get('/listings', (req, res) => {
   }
 
   const { stateToggle, allowedStates, limit } = req.query;
+  
 
   const listings = getFilteredListings({
     stateToggle,
     allowedStates,
-    limit: limit ? parseInt(limit, 10) : 20
+    limit: limit ? parseInt(limit, 10) : 500
   });
 
   res.json({
