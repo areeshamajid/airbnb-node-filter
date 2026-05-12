@@ -95,8 +95,7 @@ function getPremiumScore(listing) {
 
   return reviewVolume + recentActivity + recency + consistency;
 }
-
-function getFilteredListings({ stateToggle, allowedStates, limit = 20 }) {
+function getFilteredListings({ stateToggle, allowedStates, limit }) {
   let results = listings;
 
   // Filter by state if toggle is on
@@ -110,7 +109,8 @@ function getFilteredListings({ stateToggle, allowedStates, limit = 20 }) {
     .map(l => ({ ...l, premiumScore: getPremiumScore(l) }))
     .filter(l => l.premiumScore > 0)
     .sort((a, b) => b.premiumScore - a.premiumScore)
-    .slice(0, limit)
+    .slice(0, limit || 20)
+    
       .map(({ premiumScore, ...clean }) => clean);;
 }
 
